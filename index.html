@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>근태계획표 2026</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -159,7 +162,11 @@ footer span{font-family:var(--mono);font-size:10px;color:var(--text3)}
       <div class="brand">SLX · 46H Attendance</div>
       <h1>근태 계획표 <b>2026</b></h1>
     </div>
-    <div class="year-total" id="yearTotal"></div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div id="yearTotal" style="font-family:var(--mono);font-size:12px;color:var(--text3)"></div>
+      <div id="userInfo" style="font-family:var(--mono);font-size:11px;color:var(--text2)"></div>
+      <button class="btn" onclick="logout()" style="padding:5px 12px;font-size:11px">로그아웃</button>
+    </div>
   </div>
   <div class="month-grid" id="monthGrid"></div>
 </div>
@@ -178,6 +185,7 @@ footer span{font-family:var(--mono);font-size:10px;color:var(--text3)}
         <div class="mlabel" id="mlabel"></div>
         <button id="next">&#8594;</button>
       </div>
+      <button class="btn" onclick="logout()" style="padding:5px 12px;font-size:11px" id="logoutBtn">로그아웃</button>
     </div>
   </div>
   <div class="dashboard" id="dashboard"></div>
@@ -189,16 +197,101 @@ footer span{font-family:var(--mono);font-size:10px;color:var(--text3)}
 </div>
 <div class="toast" id="toast">저장됨</div>
 
+<!-- 로그인 화면 -->
+<div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+  <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase">SLX · 46H Attendance</div>
+  <div style="font-size:24px;font-weight:300;color:var(--text)">근태 계획표 <b style="font-family:var(--mono);color:var(--accent)">2026</b></div>
+  <button onclick="googleLogin()" style="margin-top:12px;display:flex;align-items:center;gap:10px;background:white;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:500;cursor:pointer;color:#333">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Google 계정으로 로그인
+  </button>
+</div>
+
 <script>
+var firebaseConfig = {
+  apiKey: "AIzaSyB6maQRamAXPcL1h2JuNWVQ1VsJXswCGCs",
+  authDomain: "attendance-2026-b0191.firebaseapp.com",
+  projectId: "attendance-2026-b0191",
+  storageBucket: "attendance-2026-b0191.firebasestorage.app",
+  messagingSenderId: "496218708019",
+  appId: "1:496218708019:web:ae3554b1470af0b920ab46"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+var auth = firebase.auth();
+var currentUser = null;
+var localCache = {};
+
 var TARGET_DAY = 46 / 5;
 var Y = 2026;
 var M = Math.min(12, Math.max(1, new Date().getMonth() + 1));
 
-function lsKey(m) { return 'att26_' + m; }
-function load(m) { try { return JSON.parse(localStorage.getItem(lsKey(m))) || {}; } catch(e) { return {}; } }
-function save(m, d) { localStorage.setItem(lsKey(m), JSON.stringify(d)); showToast(); }
-function showToast() {
+// Google 로그인
+function googleLogin() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(e) { alert('로그인 실패: ' + e.message); });
+}
+
+// 로그아웃
+function logout() {
+  auth.signOut();
+}
+
+// 로그인 상태 감지
+auth.onAuthStateChanged(function(user) {
+  var loginEl = document.getElementById('loginScreen');
+  if (user) {
+    currentUser = user;
+    loginEl.style.display = 'none';
+    var userInfo = document.getElementById('userInfo');
+    if (userInfo) userInfo.textContent = user.displayName || user.email;
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('appScreen').classList.remove('active');
+    localCache = {}; // 다른 계정 캐시 초기화
+    renderHome();
+  } else {
+    currentUser = null;
+    localCache = {};
+    loginEl.style.display = 'flex';
+    document.getElementById('homeScreen').classList.remove('active');
+    document.getElementById('appScreen').classList.remove('active');
+  }
+});
+
+function lsKey(m) { return 'att26_' + (currentUser ? currentUser.uid : 'guest') + '_' + m; }
+
+function load(m) {
+  if (localCache[m]) return localCache[m];
+  try { var d = JSON.parse(localStorage.getItem(lsKey(m))) || {}; localCache[m] = d; return d; }
+  catch(e) { return {}; }
+}
+
+function save(m, d) {
+  if (!currentUser) return;
+  localCache[m] = d;
+  localStorage.setItem(lsKey(m), JSON.stringify(d));
+  db.collection('users').doc(currentUser.uid).collection('attendance').doc('m' + m).set(d)
+    .then(function() { showToast('✓ 저장됨'); })
+    .catch(function() { showToast('⚠ 오프라인 저장됨'); });
+}
+
+function loadFromFirebase(m, callback) {
+  if (!currentUser) { callback(load(m)); return; }
+  db.collection('users').doc(currentUser.uid).collection('attendance').doc('m' + m).get()
+    .then(function(doc) {
+      if (doc.exists) {
+        var d = doc.data();
+        localCache[m] = d;
+        localStorage.setItem(lsKey(m), JSON.stringify(d));
+        callback(d);
+      } else {
+        callback(load(m));
+      }
+    })
+    .catch(function() { callback(load(m)); });
+}
+function showToast(msg) {
   var el = document.getElementById('toast');
+  el.textContent = msg || '저장됨';
   el.classList.add('show');
   clearTimeout(el._t);
   el._t = setTimeout(function() { el.classList.remove('show'); }, 1600);
@@ -336,10 +429,12 @@ function buildWmap() {
 
 function render() {
   document.getElementById('mlabel').textContent = M + '월';
-  var data = load(M);
-  var wmap = buildWmap();
-  renderDashboard(wmap, data);
-  renderWeeks(wmap, data);
+  // Firebase에서 최신 데이터 불러온 후 렌더링
+  loadFromFirebase(M, function(data) {
+    var wmap = buildWmap();
+    renderDashboard(wmap, data);
+    renderWeeks(wmap, data);
+  });
 }
 
 function renderDashboard(wmap, data) {
@@ -696,10 +791,26 @@ function renderHome() {
 
   var curMonth = new Date().getMonth() + 1;
   var yearTotal = 0, yearTarget = 0;
+  var loaded = 0;
+  var totals = {};
 
+  // 12개월 Firebase에서 병렬로 불러오기
+  for (var m = 1; m <= 12; m++) {
+    (function(month) {
+      loadFromFirebase(month, function() {
+        totals[month] = getMonthTotal(month);
+        loaded++;
+        if (loaded === 12) renderHomeGrid(totals, curMonth);
+      });
+    })(m);
+  }
+}
+
+function renderHomeGrid(totals, curMonth) {
+  var yearTotal = 0, yearTarget = 0;
   var html = '';
   for (var m = 1; m <= 12; m++) {
-    var total = getMonthTotal(m);
+    var total = totals[m] || 0;
     var target = getMonthTarget(m);
     var hasData = total > 0;
     var pct = target > 0 ? Math.min(100, (total / target) * 100) : 0;
@@ -719,7 +830,6 @@ function renderHome() {
       '</div>';
   }
   document.getElementById('monthGrid').innerHTML = html;
-
   var yDiffTxt = yearTotal > 0 ? fhBig(yearTotal) + ' / ' + fhBig(yearTarget) : '아직 입력된 데이터 없음';
   document.getElementById('yearTotal').textContent = '연간 누적: ' + yDiffTxt;
 }
