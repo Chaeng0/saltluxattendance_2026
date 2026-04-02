@@ -79,7 +79,7 @@ h1 b{font-family:var(--mono);font-weight:500;color:var(--accent)}
 
 .drows{display:none}
 .drows.open{display:block}
-.drow{display:grid;grid-template-columns:44px 26px 86px 86px 96px 58px;align-items:center;padding:0 14px;min-height:44px;border-bottom:1px solid var(--border);transition:background .1s;gap:4px}
+.drow{display:grid;grid-template-columns:44px 26px 86px 86px 70px 96px 58px;align-items:center;padding:0 14px;min-height:44px;border-bottom:1px solid var(--border);transition:background .1s;gap:4px}
 .drow:last-child{border-bottom:none}
 .drow:hover{background:rgba(255,255,255,.025)}
 .drow.wknd{opacity:.35;pointer-events:none}
@@ -115,8 +115,8 @@ footer span{font-family:var(--mono);font-size:10px;color:var(--text3)}
 
 @media(max-width:580px){
   .dash-top{grid-template-columns:1fr}
-  .drow{grid-template-columns:38px 22px 76px 76px 80px 50px;padding:0 10px}
-  .tinput{width:44px;font-size:11px}
+  .drow{grid-template-columns:38px 22px 70px 70px 56px 76px 46px;padding:0 8px}
+  .tinput{width:40px;font-size:11px}
 }
 
 /* ── Home screen ── */
@@ -232,14 +232,23 @@ function lunchDeduct(inT, outT) {
   return overlap > 0 ? overlap / 60 : 0;
 }
 
-function calcH(inT, outT, type) {
+function calcH(inT, outT, type, brk) {
+  var extra = brk ? parseBreak(brk) : 0;
   if (type === '연차' || type === '공휴일') return TARGET_DAY;
   if (type === '반차') {
-    var actual = (inT && outT) ? Math.max(0, timeDiff(inT, outT) - lunchDeduct(inT, outT)) : 0;
+    var actual = (inT && outT) ? Math.max(0, timeDiff(inT, outT) - lunchDeduct(inT, outT) - extra) : 0;
     return TARGET_DAY / 2 + actual;
   }
   if (!inT || !outT) return 0;
-  return Math.max(0, timeDiff(inT, outT) - lunchDeduct(inT, outT));
+  return Math.max(0, timeDiff(inT, outT) - lunchDeduct(inT, outT) - extra);
+}
+
+// "1:00" 또는 "0:30" 형태를 시간(소수)으로 변환
+function parseBreak(v) {
+  if (!v) return 0;
+  var p = v.split(':').map(Number);
+  if (p.length === 2 && !isNaN(p[0]) && !isNaN(p[1])) return p[0] + p[1]/60;
+  return 0;
 }
 
 function timeDiff(a, b) {
@@ -270,13 +279,12 @@ function wdTotal(wd, data) {
   return wd.reduce(function(s, day) {
     if (day.dow === '토' || day.dow === '일') return s;
     if (day.otherMonth) {
-      // 다른 달 데이터는 해당 달 로컬스토리지에서 읽기
       var otherData = load(day.m);
       var rec = otherData[day.m+'-'+day.d] || {};
-      return s + calcH(rec.in, rec.out, rec.type || '해당없음');
+      return s + calcH(rec.in, rec.out, rec.type || '해당없음', rec.brk);
     }
     var rec = data[M+'-'+day.d] || {};
-    return s + calcH(rec.in, rec.out, rec.type || '해당없음');
+    return s + calcH(rec.in, rec.out, rec.type || '해당없음', rec.brk);
   }, 0);
 }
 
@@ -469,17 +477,16 @@ function buildRow(day, data) {
   // 다른 달 날짜면 해당 달 로컬스토리지에서 읽기
   var dayM = day.m || M;
   var dayData = dayM !== M ? load(dayM) : data;
-  var dk = dayM+'-'+day.d;  // 키: 실제 월-일
+  var dk = dayM+'-'+day.d;
   var rec = dayData[dk] || {};
   var type = rec.type || '해당없음';
   var isWknd = day.dow === '토' || day.dow === '일';
   var noTime = type === '연차' || type === '공휴일' || isWknd;
-  var h = isWknd ? 0 : calcH(rec.in, rec.out, type);
+  var h = isWknd ? 0 : calcH(rec.in, rec.out, type, rec.brk);
   var hc = h >= 10 ? 'h-hi' : h >= 7 ? 'h-md' : h > 0 ? 'h-lo' : '';
   var dowC = day.dow === '토' ? 'sat' : day.dow === '일' ? 'sun' : '';
   var dis = noTime ? ' disabled' : '';
   var wn = weekNum(day.dt);
-  // 날짜 표시: 다른 달이면 월도 함께 표시
   var dateLabel = day.otherMonth ? '<span style="color:var(--text3);font-size:10px">'+dayM+'/</span>'+String(day.d).padStart(2,'0') : String(day.d).padStart(2,'0');
   return '<div class="drow'+(isWknd?' wknd':'')+(isToday(day.d)&&dayM===M?' today':'')+'" id="dr'+dk+'">' +
     '<div class="ddate">'+dateLabel+'</div>' +
@@ -491,6 +498,10 @@ function buildRow(day, data) {
     '<div class="twrap'+(noTime?' disabled':'')+'" id="twout'+dk+'">' +
       '<input class="tinput" id="tiout'+dk+'" value="'+(rec.out||'')+'" placeholder="--:--" maxlength="5"'+dis+
         ' oninput="onTInput(this)" onblur="onTBlur(this,\''+dk+'\',\'out\','+dayM+')" onkeydown="onTKey(event)">' +
+    '</div>' +
+    '<div class="twrap'+(noTime?' disabled':'')+'" id="twbrk'+dk+'" style="width:fit-content">' +
+      '<input class="tinput" id="tibrk'+dk+'" value="'+(rec.brk||'')+'" placeholder="+휴게" maxlength="5" style="width:48px;color:var(--amber)"'+dis+
+        ' oninput="onTInput(this)" onblur="onTBlur(this,\''+dk+'\',\'brk\','+dayM+')" onkeydown="onTKey(event)">' +
     '</div>' +
     '<select class="dtype" id="tp'+dk+'" onchange="onType(\''+dk+'\',this.value,'+wn+','+dayM+')">' +
       '<option value="해당없음"'+(type==='해당없음'?' selected':'')+'>—</option>' +
@@ -584,7 +595,7 @@ function onType(dk, type, wn, dayM) {
 
 function updateRowUI(dk, rec) {
   var type = rec.type || '해당없음';
-  var h = calcH(rec.in, rec.out, type);
+  var h = calcH(rec.in, rec.out, type, rec.brk);
   var el = document.getElementById('dh'+dk);
   if (!el) return;
   el.textContent = fh(h);
@@ -651,7 +662,7 @@ function getMonthTotal(m) {
       var dayD = cur.getDate();
       var data = load(dayM);
       var rec = data[dayM+'-'+dayD] || {};
-      total += calcH(rec.in, rec.out, rec.type || '해당없음');
+      total += calcH(rec.in, rec.out, rec.type || '해당없음', rec.brk);
     }
     cur.setDate(cur.getDate() + 1);
   }
