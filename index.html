@@ -961,22 +961,18 @@ function renderHomeContent(totals){
   var remain=Math.max(0, yearTarget-yearTotal);
   var statusText = pct >= 100 ? '목표 시간 달성 완료' : '남은 목표 ' + fh(remain);
 
-  var html=
-    '<div class="home-hero">' +
-      '<div class="hero-copy">' +
-        '<div class="hero-eyebrow">SLX Team · 46H Attendance</div>' +
-        '<div class="hero-title">한 해 근무 흐름을<br>더 깔끔하게 확인하세요</div>' +
-        '<div class="hero-desc">회사 기준 정산 기간과 주차별 목표를 반영해 월별 진행 상태를 한눈에 정리했습니다. 필요한 달을 눌러 바로 상세 입력 화면으로 이동할 수 있어요.</div>' +
-        '<div class="hero-points">' +
-          '<span class="hero-point">현재 달성률 ' + pct.toFixed(1) + '%</span>' +
-          '<span class="hero-point">' + statusText + '</span>' +
-          '<span class="hero-point">월 카드 클릭으로 바로 이동</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="hero-visual">' +
-        '<div class="hero-grid"></div>' +
-      '</div>' +
-    '</div>';
+  var html =
+  '<div class="home-hero">' +
+    '<div class="hero-copy">' +
+      '<div class="hero-eyebrow">SLX Team · 46H Attendance</div>' +
+      '<div class="hero-title">한 해 근무 흐름을<br>더 깔끔하게 확인하세요</div>' +
+      '<div class="hero-desc">회사 기준 정산 기간과 주차별 목표를 반영해 월별 진행 상태를 한눈에 정리했습니다.</div>' +
+    '</div>' +
+    '<div class="hero-visual">' +
+      '<div class="hero-grid"></div>' +
+    '</div>' +
+  '</div>';
+  
   html += '<div class="section-title">월별 현황</div>';
   html += '<div class="month-grid">';
   for(var m=1;m<=12;m++){
