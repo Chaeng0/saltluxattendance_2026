@@ -671,21 +671,19 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 
 /* -- Theme Toggle -- */
 body[data-theme="dark"] {
-  --panel:#162033; --panel2:#101827;
-  --border:#2b3955; --border2:#3a4d73;
-  --text:#edf4ff; --text2:#aec2e4; --text3:#7087ad;
-  --cyan:#6fa4ff; --cyan-dim:rgba(111,164,255,.16);
+  --panel:#111827; --panel2:#162033;
+  --border:#2c3b54; --border2:#415574;
+  --text:#f3f7ff; --text2:#b7c6dc; --text3:#7f91aa;
+  --cyan:#67a0ff; --cyan-dim:rgba(103,160,255,.18);
   --green:#39d7a1; --green-dim:rgba(57,215,161,.14);
-  --red:#ff7d8c; --red-dim:rgba(255,125,140,.14);
-  --amber:#f5c05c; --amber-dim:rgba(245,192,92,.14);
-  --shadow:0 18px 50px rgba(0,0,0,.30);
-  --shadow-soft:0 10px 28px rgba(0,0,0,.22);
-  background:
-    radial-gradient(circle at top left, rgba(111,164,255,.14), transparent 28%),
-    linear-gradient(180deg, #0b1220 0%, #101827 48%, #0d1423 100%);
+  --red:#ff7f8f; --red-dim:rgba(255,127,143,.16);
+  --amber:#f5c967; --amber-dim:rgba(245,201,103,.16);
+  --shadow:0 14px 34px rgba(0,0,0,.24);
+  --shadow-soft:0 8px 20px rgba(0,0,0,.18);
+  background:#0b1120;
 }
 .theme-switcher {
-  padding:14px 18px;
+  padding:12px 18px;
   border-bottom:1px solid var(--border);
 }
 .theme-toggle {
@@ -694,13 +692,13 @@ body[data-theme="dark"] {
   gap:4px;
   padding:4px;
   border:1px solid var(--border);
-  border-radius:16px;
+  border-radius:12px;
   background:rgba(61,134,255,.08);
 }
 .theme-option {
   border:0;
-  border-radius:12px;
-  padding:10px 6px;
+  border-radius:8px;
+  padding:9px 6px;
   background:transparent;
   color:var(--text3);
   font-family:var(--mono);
@@ -713,10 +711,20 @@ body[data-theme="dark"] {
 .theme-option.active {
   background:white;
   color:var(--cyan);
-  box-shadow:var(--shadow-soft);
+  box-shadow:none;
 }
 body[data-theme="dark"] .theme-option.active {
-  background:#1b2940;
+  background:#26364f;
+  color:#ffffff;
+}
+body[data-theme="dark"] .sidebar {
+  background:#0f1726;
+  border-right-color:var(--border);
+  box-shadow:none;
+}
+body[data-theme="dark"] .topbar {
+  background:#0f1726;
+  border-bottom-color:var(--border);
 }
 body[data-theme="dark"] .sidebar,
 body[data-theme="dark"] .topbar,
@@ -726,13 +734,31 @@ body[data-theme="dark"] .kpi,
 body[data-theme="dark"] .chart-card,
 body[data-theme="dark"] .wblock,
 body[data-theme="dark"] .login-box {
-  background:#111a2b;
+  background:#111827;
   border-color:var(--border);
+}
+body[data-theme="dark"] .month-card,
+body[data-theme="dark"] .dash-card,
+body[data-theme="dark"] .kpi,
+body[data-theme="dark"] .chart-card,
+body[data-theme="dark"] .wblock {
+  box-shadow:none;
 }
 body[data-theme="dark"] .home-hero,
 body[data-theme="dark"] .month-hero {
-  background:linear-gradient(135deg, #162033 0%, #111a2b 58%, #0e1728 100%);
+  background:#111827;
   border-color:var(--border);
+  box-shadow:none;
+}
+body[data-theme="dark"] .home-hero::before,
+body[data-theme="dark"] .home-hero::after,
+body[data-theme="dark"] .month-hero::before,
+body[data-theme="dark"] .month-hero::after,
+body[data-theme="dark"] .hero-visual::before,
+body[data-theme="dark"] .hero-visual::after,
+body[data-theme="dark"] .month-hero-visual::before,
+body[data-theme="dark"] .month-hero-visual::after {
+  opacity:.18;
 }
 body[data-theme="dark"] .hero-visual,
 body[data-theme="dark"] .month-hero-visual,
@@ -742,18 +768,36 @@ body[data-theme="dark"] .month-nav-btn,
 body[data-theme="dark"] .back-btn,
 body[data-theme="dark"] .logout-btn,
 body[data-theme="dark"] .google-btn {
-  background:#111a2b;
+  background:#0f1726;
   border-color:var(--border);
   color:var(--text2);
+}
+body[data-theme="dark"] .whead {
+  background:#f4f8ff;
+  border-bottom-color:#d7e4f8;
+}
+body[data-theme="dark"] .whead .wtitle,
+body[data-theme="dark"] .whead .wtoggle {
+  color:#8aa1c0;
+}
+body[data-theme="dark"] .whead:hover {
+  background:#edf3fb;
+}
+body[data-theme="dark"] .drow {
+  border-bottom-color:#4a5d79;
+}
+body[data-theme="dark"] .drow:hover,
+body[data-theme="dark"] .drow.today {
+  background:#17243a;
 }
 body[data-theme="dark"] .prog-bg,
 body[data-theme="dark"] .mc-bar,
 body[data-theme="dark"] .wbar-bg,
 body[data-theme="dark"] .wbar-outer {
-  background:#1d2a42;
+  background:#233149;
 }
 body[data-theme="dark"] .ring-hole {
-  background:linear-gradient(180deg, #172238 0%, #101827 100%);
+  background:#0f1726;
   border-color:var(--border);
 }
 
