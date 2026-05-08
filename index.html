@@ -226,13 +226,13 @@ body{
   border-radius:24px; padding:24px 26px;
   box-shadow:var(--shadow);
 }
-.dash-card-title { font-family:var(--mono); font-size:10px; color:var(--text3); letter-spacing:.1em; text-transform:uppercase; margin-bottom:12px; }
+.dash-card-title { font-family:var(--mono); font-size:12px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; font-weight:700; }
 .month-total-val { font-family:var(--display); font-size:42px; font-weight:800; color:var(--cyan); line-height:1; }
 .month-total-val small { font-size:15px; color:var(--text3); font-weight:500; margin-left:8px; }
 .month-diff-txt { font-family:var(--mono); font-size:12px; margin-top:8px; }
 .prog-bg { height:10px; background:#edf3ff; border-radius:999px; overflow:hidden; margin-top:16px; }
 .prog-fg { height:100%; border-radius:999px; transition:width .4s; }
-.prog-meta { display:flex; justify-content:space-between; margin-top:8px; font-size:10px; color:var(--text3); font-family:var(--mono); }
+.prog-meta { display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--text3); font-family:var(--mono); }
 
 .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .kpi {
@@ -240,7 +240,7 @@ body{
   border:1px solid var(--border); border-radius:20px; padding:16px;
   box-shadow:var(--shadow-soft);
 }
-.kpi-label { font-family:var(--mono); font-size:9px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+.kpi-label { font-family:var(--mono); font-size:10px; color:var(--text3); letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; font-weight:700; }
 .kpi-val { font-family:var(--display); font-size:24px; font-weight:800; line-height:1; }
 .kpi-sub { font-size:11px; color:var(--text2); margin-top:6px; }
 
@@ -271,7 +271,7 @@ body{
   border-bottom:1px solid var(--border); cursor:pointer; user-select:none; transition:background .1s;
 }
 .whead:hover { background:#edf4ff; }
-.wtitle { font-family:var(--mono); font-size:11px; color:var(--text2); letter-spacing:.03em; }
+.wtitle { font-family:var(--mono); font-size:12px; color:var(--text2); letter-spacing:.03em; font-weight:700; }
 .winfo { display:flex; align-items:center; gap:10px; }
 .wbar-bg { width:76px; height:8px; background:#eaf1ff; border-radius:999px; overflow:hidden; }
 .wbar-fg { height:100%; border-radius:2px; transition:width .35s; }
@@ -326,7 +326,7 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 .wfoot {
   padding:12px 18px; background:rgba(61,134,255,.04);
   border-top:1px dashed rgba(61,134,255,.18); font-family:var(--mono);
-  font-size:11px; color:var(--text3); display:flex; gap:16px; flex-wrap:wrap;
+  font-size:12px; color:var(--text3); display:flex; gap:16px; flex-wrap:wrap;
 }
 .wfoot b { font-weight:500; }
 
@@ -464,7 +464,7 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 .month-chip-label {
   display:block;
   font-family:var(--mono);
-  font-size:9px;
+  font-size:10px;
   letter-spacing:.08em;
   color:var(--text3);
   text-transform:uppercase;
@@ -733,6 +733,8 @@ body[data-theme="dark"] .dash-card,
 body[data-theme="dark"] .kpi,
 body[data-theme="dark"] .chart-card,
 body[data-theme="dark"] .wblock,
+body[data-theme="dark"] .month-chip,
+body[data-theme="dark"] .ring-panel,
 body[data-theme="dark"] .login-box {
   background:#111827;
   border-color:var(--border);
@@ -754,11 +756,12 @@ body[data-theme="dark"] .home-hero::before,
 body[data-theme="dark"] .home-hero::after,
 body[data-theme="dark"] .month-hero::before,
 body[data-theme="dark"] .month-hero::after,
+body[data-theme="dark"] .hero-grid,
 body[data-theme="dark"] .hero-visual::before,
 body[data-theme="dark"] .hero-visual::after,
 body[data-theme="dark"] .month-hero-visual::before,
 body[data-theme="dark"] .month-hero-visual::after {
-  opacity:.18;
+  opacity:0;
 }
 body[data-theme="dark"] .hero-visual,
 body[data-theme="dark"] .month-hero-visual,
@@ -772,16 +775,32 @@ body[data-theme="dark"] .google-btn {
   border-color:var(--border);
   color:var(--text2);
 }
+body[data-theme="dark"] .month-chip {
+  background:#0b1120 !important;
+  border-color:#40506a !important;
+  box-shadow:none;
+}
+body[data-theme="dark"] .ring-panel {
+  background:#0b1120 !important;
+  border-color:#40506a !important;
+  box-shadow:none;
+}
+body[data-theme="dark"] .ring-hole {
+  background:#0b1120 !important;
+}
+body[data-theme="dark"] .hero-grid {
+  display:none;
+}
 body[data-theme="dark"] .whead {
-  background:#f4f8ff;
-  border-bottom-color:#d7e4f8;
+  background:#0b1120 !important;
+  border-bottom-color:#40506a;
 }
 body[data-theme="dark"] .whead .wtitle,
 body[data-theme="dark"] .whead .wtoggle {
-  color:#8aa1c0;
+  color:#ffffff;
 }
 body[data-theme="dark"] .whead:hover {
-  background:#edf3fb;
+  background:#111827 !important;
 }
 body[data-theme="dark"] .drow {
   border-bottom-color:#4a5d79;
@@ -799,6 +818,56 @@ body[data-theme="dark"] .wbar-outer {
 body[data-theme="dark"] .ring-hole {
   background:#0f1726;
   border-color:var(--border);
+}
+body[data-theme="dark"] .month-chip-label,
+body[data-theme="dark"] .ring-legend-label,
+body[data-theme="dark"] .dash-card-title,
+body[data-theme="dark"] .kpi-label,
+body[data-theme="dark"] .prog-meta,
+body[data-theme="dark"] .wbar-wlabel,
+body[data-theme="dark"] .wbar-days,
+body[data-theme="dark"] .wtitle,
+body[data-theme="dark"] .wfoot {
+  color:#c9d7ec;
+}
+body[data-theme="dark"] .month-chip-value,
+body[data-theme="dark"] .ring-legend-value {
+  color:#ffffff;
+}
+body[data-theme="dark"] .dash-card-title {
+  font-size:13px;
+  letter-spacing:.08em;
+  font-weight:700;
+}
+body[data-theme="dark"] .kpi-label,
+body[data-theme="dark"] .month-chip-label {
+  font-size:12px;
+  font-weight:800;
+}
+body[data-theme="dark"] .prog-meta,
+body[data-theme="dark"] .wbar-val,
+body[data-theme="dark"] .wbar-wlabel,
+body[data-theme="dark"] .wbar-days,
+body[data-theme="dark"] .wtitle,
+body[data-theme="dark"] .wfoot {
+  font-size:13px;
+}
+body[data-theme="dark"] .wtitle {
+  font-weight:800;
+}
+body[data-theme="dark"] .month-chip-value {
+  font-size:24px;
+}
+body[data-theme="dark"] .prog-meta {
+  font-weight:700;
+}
+body[data-theme="dark"] .ring-legend-label {
+  font-size:12px;
+  color:#c9d7ec;
+}
+body[data-theme="dark"] .ring-legend-value {
+  font-size:17px;
+  color:#ffffff;
 }
 
 </style>
