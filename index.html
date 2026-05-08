@@ -528,13 +528,14 @@ select.dtype option { background:var(--panel2); color:var(--text); }
   z-index:4;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  gap:14px;
-  padding:18px 20px;
+  justify-content:flex-start;
+  gap:12px;
+  padding:16px 20px;
   border-radius:22px;
   background:rgba(255,255,255,.78);
   border:1px solid rgba(216,228,251,.95);
   box-shadow:0 18px 34px rgba(61,103,185,.10);
+  overflow:hidden;
 }
 .ym-head {
   display:flex;
@@ -553,7 +554,7 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 .ym-title {
   margin-top:6px;
   font-family:var(--display);
-  font-size:20px;
+  font-size:19px;
   font-weight:800;
   color:var(--text);
   line-height:1.1;
@@ -569,7 +570,7 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 .ym-total b {
   display:block;
   font-family:var(--display);
-  font-size:24px;
+  font-size:23px;
   color:var(--cyan);
   line-height:1;
 }
@@ -578,18 +579,19 @@ select.dtype option { background:var(--panel2); color:var(--text); }
   grid-template-columns:repeat(12,1fr);
   align-items:end;
   gap:8px;
-  min-height:92px;
+  min-height:0;
+  height:78px;
 }
 .ym-col {
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:7px;
+  gap:6px;
   min-width:0;
 }
 .ym-track {
   width:100%;
-  height:74px;
+  height:56px;
   min-width:12px;
   display:flex;
   align-items:flex-end;
@@ -608,9 +610,10 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 }
 .ym-label {
   font-family:var(--mono);
-  font-size:10px;
+  font-size:9px;
   font-weight:800;
   color:var(--text3);
+  line-height:1;
 }
 .ym-col.current .ym-track {
   border-color:var(--cyan);
@@ -746,11 +749,11 @@ select.dtype option { background:var(--panel2); color:var(--text); }
   .hero-title, .month-hero-title { font-size:30px; }
   .hero-desc, .month-hero-desc { font-size:14px; line-height:1.75; }
   .hero-visual, .month-hero-visual { min-height:170px; }
-  .year-mini-chart { inset:14px; padding:14px; gap:10px; }
-  .ym-title { font-size:17px; }
-  .ym-total b { font-size:20px; }
-  .ym-bars { gap:5px; min-height:70px; }
-  .ym-track { height:56px; min-width:8px; padding:2px; }
+  .year-mini-chart { inset:14px; padding:13px; gap:8px; }
+  .ym-title { font-size:16px; }
+  .ym-total b { font-size:19px; }
+  .ym-bars { gap:5px; height:62px; }
+  .ym-track { height:44px; min-width:8px; padding:2px; }
   .ym-label { font-size:8px; }
   .ring-dashboard { position:relative; padding:18px 0 0; }
   .ring-panel { width:100%; justify-content:center; flex-wrap:wrap; }
