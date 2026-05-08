@@ -369,6 +369,87 @@ select.dtype option { background:var(--panel2); color:var(--text); }
 }
 .toast.show { opacity:1; transform:translateY(0); }
 
+.update-modal {
+  position:fixed;
+  inset:0;
+  z-index:1200;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(15,23,38,.28);
+  backdrop-filter:blur(8px);
+}
+.update-modal.show { display:flex; }
+.update-card {
+  width:min(420px, 100%);
+  border-radius:24px;
+  padding:26px 26px 24px;
+  background:linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+  border:1px solid var(--border);
+  box-shadow:0 24px 60px rgba(61,103,185,.20);
+  position:relative;
+}
+.update-badge {
+  display:inline-flex;
+  align-items:center;
+  padding:7px 12px;
+  border-radius:999px;
+  background:var(--cyan-dim);
+  color:var(--cyan);
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+.update-title {
+  font-family:var(--display);
+  font-size:24px;
+  font-weight:800;
+  color:var(--text);
+  line-height:1.2;
+  margin-bottom:10px;
+}
+.update-desc {
+  color:var(--text2);
+  font-size:14px;
+  font-weight:700;
+  line-height:1.7;
+  margin-bottom:20px;
+}
+.update-actions {
+  display:flex;
+  justify-content:flex-end;
+}
+.update-ok {
+  border:0;
+  border-radius:13px;
+  padding:11px 18px;
+  background:linear-gradient(135deg,#48a0ff,#5b72ff);
+  color:white;
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 14px 26px rgba(91,114,255,.22);
+}
+.update-close {
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:30px;
+  height:30px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:white;
+  color:var(--text2);
+  cursor:pointer;
+  font-size:17px;
+  line-height:1;
+}
+
 .home-hero,
 .month-hero {
   display:grid;
@@ -820,6 +901,25 @@ body[data-theme="dark"] .theme-option.active {
   background:#26364f;
   color:#ffffff;
 }
+body[data-theme="dark"] .update-modal {
+  background:rgba(3,7,18,.52);
+}
+body[data-theme="dark"] .update-card {
+  background:#111827;
+  border-color:var(--border);
+  box-shadow:0 24px 60px rgba(0,0,0,.36);
+}
+body[data-theme="dark"] .update-title {
+  color:#ffffff;
+}
+body[data-theme="dark"] .update-desc {
+  color:#c9d7ec;
+}
+body[data-theme="dark"] .update-close {
+  background:#0b1120;
+  border-color:var(--border);
+  color:#c9d7ec;
+}
 body[data-theme="dark"] .sidebar {
   background:#0f1726;
   border-right-color:var(--border);
@@ -1060,6 +1160,18 @@ body[data-theme="dark"] .ring-legend-value {
 
 <div class="toast" id="toast">저장됨</div>
 
+<div class="update-modal" id="updateModal" role="dialog" aria-modal="true" aria-labelledby="updateTitle">
+  <div class="update-card">
+    <button class="update-close" type="button" onclick="closeUpdatePopup()" aria-label="닫기">×</button>
+    <div class="update-badge">Today Update</div>
+    <div class="update-title" id="updateTitle">라이트 / 다크모드가 추가됐어요</div>
+    <div class="update-desc">왼쪽 메뉴 상단에서 원하는 화면 모드를 바로 선택할 수 있습니다. 선택한 모드는 다음 접속 때도 유지됩니다.</div>
+    <div class="update-actions">
+      <button class="update-ok" type="button" onclick="closeUpdatePopup()">확인</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var firebaseConfig = {
   apiKey: "AIzaSyB6maQRamAXPcL1h2JuNWVQ1VsJXswCGCs",
@@ -1079,6 +1191,8 @@ var Y = 2026;
 var M = Math.min(12, Math.max(1, new Date().getMonth() + 1));
 var currentView = 'home';
 var THEME_KEY = 'att26_theme';
+var UPDATE_POPUP_DATE = '2026-05-08';
+var UPDATE_POPUP_KEY = 'att26_update_popup_' + UPDATE_POPUP_DATE;
 
 function setTheme(theme) {
   var next = theme === 'dark' ? 'dark' : 'light';
@@ -1103,6 +1217,24 @@ function initTheme() {
   setTheme(saved);
 }
 initTheme();
+
+function todayKey() {
+  var now = new Date();
+  return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+}
+function showUpdatePopupIfNeeded() {
+  if (todayKey() !== UPDATE_POPUP_DATE) return;
+  try {
+    if (localStorage.getItem(UPDATE_POPUP_KEY) === 'closed') return;
+  } catch(e) {}
+  var modal = document.getElementById('updateModal');
+  if (modal) modal.classList.add('show');
+}
+function closeUpdatePopup() {
+  var modal = document.getElementById('updateModal');
+  if (modal) modal.classList.remove('show');
+  try { localStorage.setItem(UPDATE_POPUP_KEY, 'closed'); } catch(e) {}
+}
 
 
 function googleLogin() {
@@ -1132,6 +1264,7 @@ auth.onAuthStateChanged(function(user) {
     localCache = {};
     buildSidebarMonths();
     renderHome();
+    setTimeout(showUpdatePopupIfNeeded, 300);
   } else {
     currentUser = null;
     localCache = {};
